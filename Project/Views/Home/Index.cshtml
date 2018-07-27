@@ -1,0 +1,84 @@
+﻿@{
+    ViewBag.Title = "B2C";
+    //Maybe I would add it as a model (Market)
+    List<SelectListItem> dropDownElements = new List<SelectListItem>();
+
+    dropDownElements.Add(new SelectListItem { Text = "BTC/ETH", Value = "0", Selected = true });
+    dropDownElements.Add(new SelectListItem { Text = "BTC/XRP", Value = "1", Selected = true });
+    dropDownElements.Add(new SelectListItem { Text = "BTC/EOS", Value = "2", Selected = true });
+    dropDownElements.Add(new SelectListItem { Text = "BTC/XLM", Value = "3", Selected = true });
+    dropDownElements.Add(new SelectListItem { Text = "BTC/EOS", Value = "4", Selected = true });
+}
+
+
+<div class="jumbotron">
+    <h1>Select Pair</h1>
+    @Html.DropDownList("dropDownPairs", dropDownElements)
+
+</div>
+
+
+@section Scripts
+{
+    
+    <script type="text/javascript">
+        //Used this dictionary because the API wasn't simple - I had more options on how to approach it, decide to go with that one.
+        var dict = {
+            BTC: "1",
+            ETH: "1027",
+            XRP: "52",
+            EOS: "1765",
+            XLM: "512",
+            LTC: "2"
+        };
+
+
+        function formatTicker(ticker){
+            return ticker[0].data;
+        }
+
+
+        $(document).ready(function () {
+            $("#dropDownPairs").change(function () {
+
+                //Choose the pairs from the dropDown list.
+                let pairsFromDropDownList = $("#dropDownPairs Option:Selected").text().split("/");
+
+                //Get the data on each coin
+                //The api of CMC needs an id so I just save it but I'm guessing that b2c have it directly so I could skip that phase.
+                var ticker1AJAX = $.get("https://api.coinmarketcap.com/v2/ticker/" + dict[pairsFromDropDownList[0]] + "/").fail(function () {
+                    alert("error");
+                });
+                var ticker2AJAX = $.get("https://api.coinmarketcap.com/v2/ticker/" + dict[pairsFromDropDownList[1]] + "/").fail(function () {
+                    alert("error");
+                });
+
+                //Wait for the response - Can add the tests above.
+                $.when(ticker2AJAX, ticker1AJAX).done(function (inputTickerAData, inputTickerBData) {
+                    let tickerA = formatTicker(inputTickerAData);
+                    let tickerB = formatTicker(inputTickerBData);
+
+                    //Kind of slider for the tickers.
+                    swal.mixin({
+                        confirmButtonText: 'Next &rarr;',
+                        showCancelButton: false,
+                        progressSteps: ['1', '2']
+                    }).queue([
+                        {
+                            title: tickerA["name"],
+                            text: "Rank: " + tickerA["rank"] + ",Total supply: " + tickerA["total_supply"] + "."
+                        },
+                        {
+                            title: tickerB["name"],
+                            text: "Rank: " + tickerB["rank"] + ",Total supply: " + tickerB["total_supply"] + "."
+                        }
+                    ]);
+
+                });
+               
+            });
+        });
+
+    </script>    
+    
+}
