@@ -24,7 +24,6 @@
 
 @section Scripts
 {
-    
     <script type="text/javascript">
         //Used this dictionary because the API wasn't simple - I had more options on how to approach it, decide to go with that one.
         var dict = {
@@ -37,7 +36,7 @@
         };
 
 
-        function formatTicker(ticker){
+        function formatTickerCoinMarketCap(ticker){
             return ticker[0].data;
         }
 
@@ -50,17 +49,18 @@
 
                 //Get the data on each coin
                 //The api of CMC needs an id so I just save it but I'm guessing that b2c have it directly so I could skip that phase.
-                var ticker1AJAX = $.get("https://api.coinmarketcap.com/v2/ticker/" + dict[pairsFromDropDownList[0]] + "/").fail(function () {
+                let ticker1AJAXCMC = $.get("https://api.coinmarketcap.com/v2/ticker/" + dict[pairsFromDropDownList[0]] + "/").fail(function () {
                     alert("error");
                 });
-                var ticker2AJAX = $.get("https://api.coinmarketcap.com/v2/ticker/" + dict[pairsFromDropDownList[1]] + "/").fail(function () {
+
+                let ticker2AJAX = $.get("https://api.coinmarketcap.com/v2/ticker/" + dict[pairsFromDropDownList[1]] + "/").fail(function () {
                     alert("error");
                 });
 
                 //Wait for the response - Can add the tests above.
-                $.when(ticker2AJAX, ticker1AJAX).done(function (inputTickerAData, inputTickerBData) {
-                    let tickerA = formatTicker(inputTickerAData);
-                    let tickerB = formatTicker(inputTickerBData);
+                $.when(ticker2AJAX, ticker1AJAXCMC).done(function (inputTickerAData, inputTickerBData) {
+                    let tickerA = formatTickerCoinMarketCap(inputTickerAData);
+                    let tickerB = formatTickerCoinMarketCap(inputTickerBData);
 
                     //Kind of slider for the tickers.
                     swal.mixin({
@@ -83,6 +83,5 @@
             });
         });
 
-    </script>    
-    
+    </script>      
 }
